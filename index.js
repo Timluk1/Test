@@ -43,6 +43,7 @@ const finished = [];
 let activeTask = null;
 let clickDontActive = false;
 let correctAns = 0;
+let showResult = false;
 
 const tasks = document.querySelector("#tasks");
 const variantsAns = document.querySelector("#variants-ans");
@@ -124,7 +125,7 @@ function resetTask() {
 
 function getTaskHtml(task, index) {
     return `
-        <div class="task">
+        <div id="task" class="task">
             <p>${index}. ${task}</p>
         </div>
     `;
@@ -132,9 +133,9 @@ function getTaskHtml(task, index) {
 
 function getVariantAnsHtml(text) {
     return `
-        <div class="variant-ans" data-value="${text}">
+        <button class="variant-ans" data-value="${text}">
             <p>${text}</p>
-        </div>
+        </button>
     `;
 }
 
@@ -147,15 +148,30 @@ function getResultHtml() {
     `;
 }
 
+function getButtonShowResHtml() {
+    return `
+        <button id="button-show" class="variant-ans">
+            <p>Показать результат</p>
+        </button>
+    `
+}
+
 function renderVariantsAns(variants) {
     variants.forEach((variant) => {
         variantsAns.innerHTML += getVariantAnsHtml(variant.text);
     });
 }
 
+
+function renderCorrectAns(variants) {
+    variants.find((variant) => variant.isCorrect);
+
+}
+
 function renderTask(task, index) {
     tasks.innerHTML += getTaskHtml(task, index);
 }
+
 
 function getRandomNumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -178,7 +194,16 @@ function main() {
         renderVariantsAns(variants);
         addListeners();
         questions.splice(randomIndex, 1);
-    } else {
+    } else if (!showResult) {
+        variantsAns.innerHTML = getButtonShowResHtml();
+        const button = document.querySelector("#button-show");
+        button.addEventListener("click", () => {
+            showResult = true;
+            main();
+        });
+    }
+    else {
+        variantsAns.innerHTML = "";
         tasks.style.display = "flex";
         tasks.style.justifyContent = "center";
         tasks.innerHTML = getResultHtml();
